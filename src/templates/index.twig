@@ -1,0 +1,110 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * Lockdown plugin for Craft CMS 3.x
+ *
+ * Lockdown index.twig
+ *
+ * @author    TrendyMinds
+ * @copyright Copyright (c) 2019 TrendyMinds
+ * @link      https://trendyminds.com
+ * @package   Lockdown
+ * @since     1.0.0
+ */
+#}
+
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% set title = "Allowed IPs" %}
+{% set pluginCpUrl = url('lockdown') %}
+
+{% block actionButton %}
+  <a class="btn submit add icon" href="{{ url('lockdown/new') }}">New IP</a>
+{% endblock %}
+
+{% set content %}
+  <div id="noips"{% if restrictions %} class="hidden"{% endif %}>
+    <p>No whitelisted IP addresses exist yet.</p>
+  </div>
+
+  {% if restrictions | length %}
+    <input type="search" class="text fullwidth" placeholder="Search an IP address to see which records whitelist it" autofocus="on">
+
+    <br><br>
+
+    <table id="restrictions" class="data fullwidth collapsible">
+      <thead>
+        <tr>
+          <th>IP Address</th>
+          <th>IP Address (End of range)</th>
+          <th>Notes</th>
+          <th>Post Date</th>
+          <th class="thin"></th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for restriction in restrictions %}
+            <tr data-ip-min="{{restriction.ipAddressStart}}" data-ip-max="{{restriction.ipAddressEnd ?: restriction.ipAddressStart}}" data-id="{{restriction.id}}" data-name="{{restriction.ipAddressStart}}">
+              <td><a href='{{url("lockdown/edit/#{restriction.id}")}}'>{{restriction.ipAddressStart}}</a></td>
+              <td>{{restriction.ipAddressEnd}}</td>
+              <td>{{restriction.notes}}</td>
+              <td>{{restriction.dateCreated | date('short')}}</td>
+              <td class="thin action">
+                <a class="delete icon" title="Delete" role="button"></a>
+              </td>
+            </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endset %}
+
+{% js %}
+    function ipToNum(ip) {
+      return Number(ip.split(".").map(d => ("000"+d).substr(-3)).join(""));
+    }
+
+    var adminTable = new Craft.AdminTable({
+        tableSelector: '#restrictions',
+        noObjectsSelector: '#noips',
+        deleteAction: 'lockdown/default/delete',
+        confirmDeleteMessage: '{{"Are you sure you want to delete “{name}”?"}}'
+    });
+
+    $("[data-ip-min]").each(function (i, el) {
+      var ipMin = ipToNum($(el).data('ipMin'));
+      var ipMax = ipToNum($(el).data('ipMax'));
+
+      el.dataset.ipMin = ipMin;
+      el.dataset.ipMax = ipMax;
+    });
+
+    function searchRows(ev) {
+      var value = ipToNum(ev.currentTarget.value);
+
+      if (value === 0) {
+        $("[data-ip-min]").removeClass("hide");
+        return true;
+      }
+
+      $("[data-ip-min]").each(function (i, el) {
+        var min = el.dataset.ipMin;
+        var max = el.dataset.ipMax;
+
+        if (value >= min && value <= max) {
+          $(el).removeClass("hide");
+        } else {
+          $(el).addClass("hide");
+        }
+      });
+    }
+
+    $("input[type='search']").on("input", searchRows);
+{% endjs %}
+
+{% css %}
+  .hide {
+    display: none !important;
+  }
+{% endcss %}

@@ -1,0 +1,43 @@
+{
+    "name": "trendyminds/lockdown",
+    "description": "Whitelist your control panel by IP address",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "lockdown"
+    ],
+    "support": {
+        "docs": "https://github.com/trendyminds/lockdown/blob/master/README.md",
+        "issues": "https://github.com/trendyminds/lockdown/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "TrendyMinds",
+            "homepage": "https://trendyminds.com"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1"
+    },
+    "autoload": {
+        "psr-4": {
+          "trendyminds\\lockdown\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Lockdown",
+        "handle": "lockdown",
+        "hasCpSettings": true,
+        "hasCpSection": true,
+        "changelogUrl": "https://raw.githubusercontent.com/trendyminds/lockdown/master/CHANGELOG.md",
+        "components": {
+            "lockdownService": "trendyminds\\lockdown\\services\\LockdownService"
+        },
+        "class": "trendyminds\\lockdown\\Lockdown"
+    }
+}

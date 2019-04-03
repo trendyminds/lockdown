@@ -1,0 +1,61 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * Lockdown plugin for Craft CMS 3.x
+ *
+ * Lockdown index.twig
+ *
+ * @author    TrendyMinds
+ * @copyright Copyright (c) 2019 TrendyMinds
+ * @link      https://trendyminds.com
+ * @package   Lockdown
+ * @since     1.0.0
+ */
+#}
+
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% set create = true %}
+
+{% if craft.app.request.getSegment(2) == "edit" %}
+  {% set create = false %}
+{% endif %}
+
+{% set title = create ? "Add IP" : "Edit IP" %}
+{% set pluginCpUrl = url('lockdown') %}
+{% set fullPageForm = true %}
+
+{% set crumbs = [{ label: "Allowed IPs", url: url('lockdown') }] %}
+
+{% set content %}
+  <input type="hidden" name="action" value="lockdown/default/save">
+  <input type="hidden" name="id" value="{{entry is defined ? entry.id : ''}}">
+
+  {{forms.textField({
+      label: "IP Address",
+      placeholder: "127.0.0.1",
+      name: 'ipAddressStart',
+      value: entry is defined ? entry.ipAddressStart : "",
+      required: true,
+      autofocus: true,
+      first: true
+    })
+  }}
+
+  {{forms.textField({
+      label: "IP Address (End of range)",
+      instructions: "If you are defining a range of IPs use this field to mark the end of the range",
+      placeholder: "127.0.0.1",
+      value: entry is defined ? entry.ipAddressEnd : "",
+      name: 'ipAddressEnd'
+    })
+  }}
+
+  {{forms.textField({
+      label: "Notes",
+      value: entry is defined ? entry.notes : "",
+      name: 'notes'
+    })
+  }}
+{% endset %}
